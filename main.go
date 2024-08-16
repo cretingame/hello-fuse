@@ -25,12 +25,17 @@ type HelloRoot struct {
 func (r *HelloRoot) OnAdd(ctx context.Context) {
 	ch := r.NewPersistentInode(
 		ctx, &fs.MemRegularFile{
-			Data: []byte("file.txt"),
+			Data: []byte("Hello World in file.txt\n"),
 			Attr: fuse.Attr{
 				Mode: 0644,
 			},
 		}, fs.StableAttr{Ino: 2})
 	r.AddChild("file.txt", ch, false)
+	r.AddChild("file2.txt", ch, false)
+
+	ch2 := r.NewPersistentInode(
+		ctx, &fs.Inode{}, fs.StableAttr{Mode: syscall.S_IFDIR})
+	r.AddChild("directory", ch2, false)
 }
 
 func (r *HelloRoot) Getattr(ctx context.Context, fh fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
@@ -38,6 +43,7 @@ func (r *HelloRoot) Getattr(ctx context.Context, fh fs.FileHandle, out *fuse.Att
 	return 0
 }
 
+// INFO: I don't why it was added in the example
 var _ = (fs.NodeGetattrer)((*HelloRoot)(nil))
 var _ = (fs.NodeOnAdder)((*HelloRoot)(nil))
 
