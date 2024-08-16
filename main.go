@@ -35,6 +35,7 @@ func (r *HelloRoot) OnAdd(ctx context.Context) {
 
 	ch2 := r.NewPersistentInode(
 		ctx, &fs.Inode{}, fs.StableAttr{Mode: syscall.S_IFDIR})
+	ch2.AddChild("fileInDirectory.txt", ch, false)
 	r.AddChild("directory", ch2, false)
 }
 
