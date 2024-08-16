@@ -10,6 +10,8 @@ import (
 	"context"
 	"flag"
 	"log"
+	"os"
+	"os/signal"
 	"syscall"
 
 	"github.com/hanwen/go-fuse/v2/fs"
@@ -51,5 +53,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Mount fail: %v\n", err)
 	}
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		server.Unmount()
+	}()
+
 	server.Wait()
 }
