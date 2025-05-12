@@ -1,7 +1,9 @@
 module hello-fuse
 
-go 1.20
+go 1.23.0
 
-require github.com/hanwen/go-fuse/v2 v2.5.1
+toolchain go1.24.1
 
-require golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+require github.com/hanwen/go-fuse/v2 v2.7.2
+
+require golang.org/x/sys v0.33.0 // indirect
