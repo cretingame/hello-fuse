@@ -1,5 +1,5 @@
 EXEC = hello-fuse
-MOUNT_POINT = /mnt/hello
+MOUNT_POINT = /run/user/$(shell id -u)/hello
 
 
 help:
@@ -7,7 +7,7 @@ help:
 
 
 $(MOUNT_POINT):
-	sudo install --group=$(shell id -g) --owner=$(shell id -g) --directory $(MOUNT_POINT)
+	install --group=$(shell id -g) --owner=$(shell id -g) --directory $(MOUNT_POINT)
 
 $(CURDIR)/$(EXEC):
 	go build
@@ -17,7 +17,7 @@ run: $(MOUNT_POINT) $(CURDIR)/$(EXEC)
 
 clean:
 	rm -f $(CURDIR)/$(EXEC)
-	sudo rmdir $(MOUNT_POINT)
+	rmdir $(MOUNT_POINT)
 
 
 .PHONY: clean

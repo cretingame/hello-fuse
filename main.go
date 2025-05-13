@@ -28,6 +28,7 @@ func (r *HelloRoot) OnAdd(ctx context.Context) {
 			Data: []byte("Hello World in file.txt\n"),
 			Attr: fuse.Attr{
 				Mode: 0644,
+				// TODO: Change the Owner
 			},
 		}, fs.StableAttr{Ino: 2})
 	r.AddChild("file.txt", ch, false)
