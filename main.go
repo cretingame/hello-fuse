@@ -27,17 +27,35 @@ func (r *HelloRoot) OnAdd(ctx context.Context) {
 		ctx, &fs.MemRegularFile{
 			Data: []byte("Hello World in file.txt\n"),
 			Attr: fuse.Attr{
-				Mode: 0644,
-				// TODO: Change the Owner
+				Mode:  0644,
+				Owner: *fuse.CurrentOwner(),
 			},
-		}, fs.StableAttr{Ino: 2})
+		}, fs.StableAttr{})
 	r.AddChild("file.txt", ch, false)
-	r.AddChild("file2.txt", ch, false)
 
 	ch2 := r.NewPersistentInode(
+		ctx, &fs.MemRegularFile{
+			Data: []byte("Hello from second file\n"),
+			Attr: fuse.Attr{
+				Mode:  0644,
+				Owner: *fuse.CurrentOwner(),
+			},
+		}, fs.StableAttr{})
+	r.AddChild("file2.txt", ch2, false)
+
+	ch3 := r.NewPersistentInode(
 		ctx, &fs.Inode{}, fs.StableAttr{Mode: syscall.S_IFDIR})
-	ch2.AddChild("fileInDirectory.txt", ch, false)
-	r.AddChild("directory", ch2, false)
+	r.AddChild("directory test", ch3, false)
+
+	ch4 := r.NewPersistentInode(
+		ctx, &fs.MemRegularFile{
+			Data: []byte("Hello\n"),
+			Attr: fuse.Attr{
+				Mode:  0644,
+				Owner: *fuse.CurrentOwner(),
+			},
+		}, fs.StableAttr{})
+	ch3.AddChild("fileInDirectory.txt", ch4, false)
 }
 
 func (r *HelloRoot) Getattr(ctx context.Context, fh fs.FileHandle, out *fuse.AttrOut) syscall.Errno {
@@ -45,7 +63,6 @@ func (r *HelloRoot) Getattr(ctx context.Context, fh fs.FileHandle, out *fuse.Att
 	return 0
 }
 
-// INFO: I don't why it was added in the example
 var _ = (fs.NodeGetattrer)((*HelloRoot)(nil))
 var _ = (fs.NodeOnAdder)((*HelloRoot)(nil))
 
@@ -55,7 +72,10 @@ func main() {
 	if len(flag.Args()) < 1 {
 		log.Fatal("Usage:\n  hello MOUNTPOINT")
 	}
-	opts := &fs.Options{}
+	opts := &fs.Options{
+		GID: fuse.CurrentOwner().Gid,
+		UID: fuse.CurrentOwner().Uid,
+	}
 	opts.Debug = *debug
 	server, err := fs.Mount(flag.Arg(0), &HelloRoot{}, opts)
 	if err != nil {
