@@ -24,13 +24,16 @@ type HelloRoot struct {
 
 func (r *HelloRoot) OnAdd(ctx context.Context) {
 	ch := r.NewPersistentInode(
-		ctx, &fs.MemRegularFile{
-			Data: []byte("Hello World in file.txt\n"),
-			Attr: fuse.Attr{
-				Mode:  0644,
-				Owner: *fuse.CurrentOwner(),
+		ctx, &JoplinRegularFile{
+			MemRegularFile: fs.MemRegularFile{
+				Data: []byte("Hello World in Joplin file.txt\n"),
+				Attr: fuse.Attr{
+					Mode:  0644,
+					Owner: *fuse.CurrentOwner(),
+				},
 			},
 		}, fs.StableAttr{})
+
 	r.AddChild("file.txt", ch, false)
 
 	ch2 := r.NewPersistentInode(
